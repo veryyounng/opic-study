@@ -1,0 +1,117 @@
+@charset "UTF-8";
+:root{--canvas:#f7f1f3;--receipt:#ed5790;--receipt-light:#f274a1;--ink:#32131f;--ink-soft:#4a1c2b;--paper:#f9dce6;--rule:rgba(50,19,31,.7)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:var(--canvas);color:var(--ink);font:16px/1.5 "Courier New",Consolas,monospace}button,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #fff;outline-offset:3px}[hidden]{display:none!important}
+.app-shell{position:relative;width:min(960px,calc(100% - 120px));min-height:calc(100vh - 100px);margin:50px auto;background:var(--receipt);padding:76px 8% 38px;display:flex;flex-direction:column;box-shadow:0 0 0 1px rgba(50,19,31,.05)}
+.app-shell:before,.app-shell:after{content:"";position:absolute;left:0;width:100%;height:28px;background-repeat:repeat-x;background-size:36px 28px;pointer-events:none}
+.app-shell:before{top:-27px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Cpath fill='%23ed5790' d='M0 28 18 0l18 28z'/%3E%3C/svg%3E")}
+.app-shell:after{bottom:-27px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='28' viewBox='0 0 36 28'%3E%3Cpath fill='%23ed5790' d='M0 0h36L18 28z'/%3E%3C/svg%3E")}
+.app-header{display:flex;align-items:center;justify-content:center;text-align:center;padding:47px 0 50px;border-top:2px dotted var(--rule);border-bottom:2px dotted var(--rule)}.brand{display:flex;align-items:center;justify-content:center}.brand-mark,.brand-kicker,.header-sticker{display:none}.brand h1{margin:0;font-size:clamp(32px,6vw,58px);line-height:1.2;letter-spacing:-.09em;font-weight:700}.brand h1 em{font:inherit}
+.app-main{flex:1;min-width:0;padding:0}.picker{display:none}.question-section{position:relative;margin:48px 0 40px}.question-paper{position:relative;min-height:658px;padding:70px 32px 38px;border:4px solid var(--ink);background:transparent;text-align:center;display:flex;flex-direction:column;align-items:stretch;justify-content:center}.paper-tape,.question-sticker{display:none}.paper-top{position:absolute;right:16px;top:12px;left:16px;display:flex;align-items:center;justify-content:flex-end;gap:8px}.paper-serial{display:none}.favorite-button{width:38px;height:38px;display:grid;place-items:center;border:0;background:transparent;color:var(--ink);font-size:24px;line-height:1}.favorite-button.active{color:#fff}.question-badges{position:absolute;top:10px;left:20px;display:flex;gap:6px;opacity:.01;pointer-events:none}.topic-badge,.type-badge{font-size:10px}.prompt-label{display:none}.question-paper h2{order:3;margin:0 auto;max-width:790px;min-height:0;font-size:clamp(20px,3.2vw,34px);line-height:1.55;letter-spacing:-.045em;overflow-wrap:anywhere}.question-paper h2[hidden]{display:none!important}.question-guide{order:1;margin:0 0 24px;font-size:clamp(25px,4.5vw,42px);line-height:1.35;letter-spacing:-.07em}.question-instruction{order:2;margin:0 auto 26px;font-size:clamp(15px,2.4vw,26px);font-weight:700;letter-spacing:-.06em}.paper-actions{order:4;display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:52px;padding-top:30px;border-top:2px dotted var(--rule)}.paper-actions .button{height:140px;min-height:80px;font-size:clamp(18px,3.4vw,34px);letter-spacing:-.07em}.button{display:inline-flex;align-items:center;justify-content:center;gap:15px;padding:14px 18px;border:3px solid var(--ink);background:transparent;color:var(--ink);font-weight:700;line-height:1.15;transition:transform .15s,background .15s}.button:hover:not(:disabled){transform:translateY(-2px);background:rgba(255,255,255,.12)}.button-primary{background:var(--ink);color:#fff}.button-outline,.button-quiet,.button-small{background:transparent;color:var(--ink)}.paper-actions #speakBtn{background:var(--ink);color:#fff}.paper-actions #translationBtn:before{content:"▤";font-size:1.25em}.paper-actions #speakBtn:before{content:"▶ )))";font-family:Arial,sans-serif}
+.translation-note{order:5;width:100%;margin-top:20px;padding:14px;border-top:1px dotted var(--rule);text-align:left}.hand-note{display:none}.translation-note p{margin:0;font-family:system-ui,sans-serif;font-size:16px}
+.practice-card{margin:0;padding:38px 16px 28px;border:0;border-top:2px dotted var(--rule);border-bottom:2px dotted var(--rule);background:transparent;box-shadow:none}.practice-heading{display:flex;align-items:center;gap:17px;margin:0 0 20px 10px}.practice-heading:before{content:"◷";display:grid;place-items:center;width:64px;height:64px;border:3px solid var(--ink);border-radius:50%;font:44px/1 "Segoe UI Symbol",sans-serif}.practice-heading>div{display:flex;align-items:center;gap:10px}.practice-heading .eyebrow,.two-minutes{display:none}.practice-heading h2{margin:0;font-size:clamp(19px,3.1vw,34px);letter-spacing:-.08em}.timer-row{display:block;padding:0 0 24px}.timer-row>div:first-child{display:none}.timer{display:block;margin:0;padding:24px 8px;background:var(--receipt-light);text-align:center;font:700 clamp(34px,6.3vw,56px)/1.2 "Courier New",monospace;font-variant-numeric:tabular-nums;letter-spacing:.04em}.timer.low{color:#7d163d}.timer-controls{display:none}.record-row{display:flex;justify-content:center;padding:0;border:0}.record-info{display:none}.record-controls{width:100%;display:flex}.record-controls .button{height:132px;min-height:80px;font-size:clamp(20px,3.3vw,34px);letter-spacing:-.08em}.record-controls #recordStart{flex:1;background:var(--ink);color:white}.record-controls #recordStart:before{content:"🎙";font:52px/1 "Segoe UI Emoji",sans-serif;margin-right:18px}.record-controls #recordStop{width:auto;min-width:130px;height:64px;font-size:18px}.record-controls #recordStop:disabled{display:none}audio{display:block;width:100%;height:40px;margin-top:12px}#recordError{margin:12px 0 0;font:14px/1.5 system-ui,sans-serif;color:#491627}.hint-card{display:none}
+.favorites-view{padding:35px 0}.favorites-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.favorites-heading h2{font-size:30px}.favorites-heading p:last-child{font:14px system-ui,sans-serif}.favorites-heading img{width:90px}.favorites-list{display:grid;gap:12px;list-style:none;margin:0;padding:0}.favorite-item{width:100%;padding:16px;border:2px solid var(--ink);background:transparent;text-align:left;color:var(--ink)}.item-meta{display:block;margin-bottom:6px;font-size:12px}.item-title{font:16px/1.5 system-ui,sans-serif}.empty-state{padding:30px;border:2px dashed var(--ink);text-align:center}.empty-heart{display:block;font-size:30px}.empty-state strong{display:block}.view-nav{display:none}.receipt-barcode{position:relative;width:min(440px,70%);height:91px;margin:18px auto 0;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 8px,transparent 8px 11px,var(--ink) 11px 12px,transparent 12px 17px,var(--ink) 17px 20px,transparent 20px 23px)}.receipt-barcode:after{content:"0 35545 62336 78 1";position:absolute;top:100%;left:0;width:100%;padding-top:4px;background:var(--receipt);text-align:center;font:13px/1.2 Arial,sans-serif;letter-spacing:.03em}
+@media(max-width:700px){.app-shell{width:calc(100% - 44px);min-height:calc(100vh - 66px);margin:33px auto;padding:35px 7% 35px}.app-header{padding:28px 0}.question-section{margin:28px 0 25px}.question-paper{min-height:490px;padding:55px 16px 22px;border-width:3px}.paper-actions{gap:12px;margin-top:32px;padding-top:20px}.paper-actions .button{height:92px;padding:8px;font-size:clamp(15px,4vw,24px)}.practice-card{padding:25px 0 20px}.practice-heading{margin-left:4px}.practice-heading:before{width:48px;height:48px;font-size:34px}.timer{padding:20px 5px}.record-controls .button{height:92px}.record-controls #recordStart:before{font-size:37px;margin-right:9px}.record-controls #recordStop{min-width:83px;height:54px;font-size:14px}.receipt-barcode{width:68%;height:70px;margin-top:16px}}
+@media(max-width:390px){.app-shell{width:calc(100% - 34px);padding-left:6%;padding-right:6%}.question-paper{min-height:440px}.question-instruction{margin-bottom:16px}.paper-actions{gap:8px}.paper-actions .button{height:80px}.record-controls #recordStop{min-width:68px;padding:8px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}}
+/* Fine alignment to the receipt reference */
+.app-header{padding-top:60px;padding-bottom:59px}
+.question-paper{width:calc(100% + 56px);margin-left:-28px}
+.paper-top{display:none}
+.timer-row>div:first-child{display:block}
+.timer-row>div:first-child .tool-label{display:none}
+.timer{padding:28px 8px}
+@media(max-width:700px){.app-header{padding:28px 0}.question-paper{width:100%;margin-left:0}}
+@media(max-width:390px){
+  .app-shell{width:calc(100% - 28px);min-height:calc(100svh - 56px);margin:28px auto;padding:18px 6% 18px}
+  .app-header{padding:18px 0;font-size:30px}
+  .brand h1{font-size:30px;letter-spacing:-.09em}
+  .question-section{margin:18px 0 16px}
+  .question-paper{min-height:330px;padding:38px 12px 16px}
+  .question-guide{font-size:22px;margin-bottom:12px}
+  .question-instruction{font-size:14px;margin-bottom:14px}
+  .question-paper h2{font-size:18px;line-height:1.45}
+  .paper-actions{gap:8px;margin-top:22px;padding-top:14px}
+  .paper-actions .button{height:64px;min-height:64px;padding:7px 5px;font-size:15px;border-width:2px}
+  .practice-card{padding:16px 0 14px}
+  .practice-heading{gap:10px;margin:0 0 12px 3px}
+  .practice-heading:before{width:38px;height:38px;border-width:2px;font-size:27px}
+  .practice-heading h2{font-size:19px}
+  .timer-row{padding-bottom:14px}
+  .timer{padding:13px 5px;font-size:36px}
+  .record-controls .button{height:68px;min-height:68px;font-size:19px;border-width:2px}
+  .record-controls #recordStart:before{font-size:32px;margin-right:8px}
+  .record-controls #recordStop{min-width:64px;height:48px;font-size:12px}
+  .receipt-barcode{width:65%;height:46px;margin-top:12px}
+}
+@media(max-width:390px){
+  .app-shell{width:calc(100% - 40px);min-height:calc(100svh - 56px);margin:28px auto;padding:12px 5% 12px}
+  .app-header{padding:23px 0}
+  .brand h1{font-size:22px;line-height:1.2;letter-spacing:-.08em}
+  .question-section{margin:18px 0 14px}
+  .question-paper{min-height:290px;padding:28px 10px 12px}
+  .question-guide{font-size:18px;line-height:1.35;margin-bottom:8px}
+  .question-instruction{font-size:11px;line-height:1.4;margin-bottom:10px}
+  .question-paper h2{font-size:16px;line-height:1.4}
+  .paper-actions{gap:9px;margin-top:19px;padding-top:12px}
+  .paper-actions .button{height:58px;min-height:58px;padding:6px 4px;font-size:12px;border-width:2px}
+  .practice-card{padding:12px 0 12px}
+  .practice-heading{gap:9px;margin:0 0 9px 3px}
+  .practice-heading:before{width:31px;height:31px;border-width:2px;font-size:22px}
+  .practice-heading h2{font-size:16px}
+  .timer-row{padding-bottom:10px}
+  .timer{padding:10px 4px;font-size:28px;letter-spacing:0}
+  .record-controls .button{height:60px;min-height:60px;font-size:16px;border-width:2px}
+  .record-controls #recordStart:before{font-size:26px;margin-right:6px}
+  .record-controls #recordStop{min-width:58px;height:44px;font-size:11px}
+  .receipt-barcode{width:60%;height:40px;margin-top:10px}
+}
+/* Keep the complete trainer in a centered mobile-shaped preview at every viewport. */
+html,body{width:100%;height:100%;min-height:0;overflow:hidden}
+body{display:grid;place-items:center}
+.app-shell{width:350px;height:790px;min-height:790px;margin:0;padding:12px 17.5px;background:var(--receipt);transform:scale(var(--frame-scale,1));transform-origin:center center;}
+.app-header{padding:23px 0;border-top-width:1px;border-bottom-width:1px}
+.brand h1{font-size:22px;line-height:1.2;letter-spacing:-.08em}
+.question-section{margin:18px 0 14px}
+.question-paper{width:100%;min-height:290px;margin:0;padding:28px 10px 12px;border-width:2px}
+.question-guide{font-size:18px;line-height:1.35;margin-bottom:8px}
+.question-instruction{font-size:11px;line-height:1.4;margin-bottom:10px}
+.question-paper h2{font-size:16px;line-height:1.4}
+.paper-actions{gap:9px;margin-top:19px;padding-top:12px;border-top-width:1px}
+.paper-actions .button{height:58px;min-height:58px;padding:6px 4px;font-size:12px;border-width:2px}
+.practice-card{padding:12px 0;border-top-width:1px;border-bottom-width:1px}
+.practice-heading{gap:9px;margin:0 0 9px 3px}
+.practice-heading:before{width:31px;height:31px;border-width:2px;font-size:22px}
+.practice-heading h2{font-size:16px}
+.timer-row{padding-bottom:10px}
+.timer{padding:10px 4px;font-size:28px;letter-spacing:0}
+.record-controls .button{height:60px;min-height:60px;font-size:16px;border-width:2px}
+.record-controls #recordStart:before{font-size:26px;margin-right:6px}
+.record-controls #recordStop{min-width:58px;height:44px;font-size:11px}
+.receipt-barcode{width:60%;height:40px;margin-top:10px}
+/* Final receipt controls */
+.receipt-barcode:after{content:none}
+.record-controls{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.record-controls .button{width:100%;height:60px;min-height:60px;margin:0;padding:6px 8px;font-size:16px;border-width:2px}
+.record-controls #recordStart{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--ink);color:#fff}
+.record-controls #recordStart:before{content:none}
+.record-controls #recordStart img{display:block;width:24px;height:32px;object-fit:contain;filter:brightness(0) invert(1)}
+.record-controls #recordStart span{white-space:nowrap}
+.record-controls #recordStop{display:flex;align-items:center;justify-content:center;min-width:0;background:var(--ink);color:#fff}
+.record-controls #recordStop:disabled{display:flex;opacity:.42;cursor:not-allowed}
+.receipt-actions{margin-top:10px;padding:11px 0 0;border-top:1px dotted var(--rule)}
+.receipt-tool-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding-bottom:11px;border-bottom:1px dotted var(--rule)}
+.receipt-tool-button,.next-question-button{display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--ink);background:transparent;color:var(--ink);font-family:inherit;font-weight:700}
+.receipt-tool-button{height:38px;padding:4px;font-size:12px}
+.reset-icon{font:24px/1 Arial,sans-serif}
+.play-icon{font:15px/1 Arial,sans-serif}
+.next-question-button{width:100%;height:44px;margin-top:11px;gap:10px;font-size:14px}
+.next-question-button img{display:block;width:16px;height:20px;object-fit:contain}
+.question-section{margin:13px 0 11px}
+.question-paper{min-height:250px}
+.question-guide{margin-bottom:5px}
+.question-instruction{margin-bottom:7px}
+.paper-actions{margin-top:14px}
+@media(max-width:390px){
+ .record-controls .button{height:60px;min-height:60px;font-size:14px}
+ .record-controls #recordStart img{width:22px;height:29px}
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ed5790">
+  <meta name="description" content="내 서베이로 연습하는 OPIc 스피킹 노트">
+  <title>My OPIc Trainer</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand"><span class="brand-mark">✳</span><div><p class="brand-kicker">SPEAKING JOURNAL</p><h1>My OPIC Trainer</h1></div></div>
+      <img src="스티커/heart.png" alt="" aria-hidden="true" class="header-sticker">
+    </header>
+
+    <main class="app-main">
+      <div id="practiceView">
+        <section class="picker" aria-label="질문 선택">
+          <div class="section-intro"><div><p class="eyebrow">TODAY'S PAGE</p><h2>오늘의 질문</h2></div><span class="question-count">16 topics · 64 prompts</span></div>
+          <div class="picker-controls">
+            <label><span>유형</span><select id="typeFilter"><option value="all">전체 유형</option><option value="1">Type 1 · 현재 묘사</option><option value="2">Type 2 · 현재 루틴</option><option value="3">Type 3 · 과거 변화</option><option value="4">Type 4 · 인상적인 경험</option></select></label>
+            <label><span>주제</span><select id="topicFilter"><option value="all">전체 주제</option></select></label>
+          </div>
+          <button class="button button-primary random-button" id="randomBtn" type="button">새로운 질문 뽑기</button>
+        </section>
+
+        <section class="question-section" aria-label="현재 질문">
+          <div class="question-paper">
+            <span class="paper-tape" aria-hidden="true"></span>
+            <div class="paper-top"><span class="paper-serial">OPIC PRACTICE <span id="questionNumber">01 / 64</span></span><button class="favorite-button" id="favoriteBtn" type="button" aria-label="즐겨찾기에 저장" aria-pressed="false"><span aria-hidden="true">♡</span></button></div>
+            <div class="question-badges"><span class="topic-badge" id="topicBadge"></span><span class="type-badge" id="typeBadge"></span></div>
+            <p class="prompt-label">QUESTION</p>
+            <p class="question-guide" id="questionGuide">질문을 먼저 들어보세요</p>
+            <p class="question-instruction" id="questionInstruction">문장 확인을 누르면 영어 질문이 나타납니다</p>
+            <h2 id="prompt" aria-live="polite" hidden></h2>
+            <div class="paper-actions"><button class="button button-outline" id="speakBtn" type="button">질문 듣기</button><button class="button button-quiet" id="translationBtn" type="button" aria-expanded="false" aria-controls="prompt">문장 확인</button></div>
+          </div>
+          <img src="스티커/star.png" alt="" aria-hidden="true" class="question-sticker">
+        </section>
+
+        <section class="practice-card" aria-label="실전 연습">
+          <div class="practice-heading"><div><p class="eyebrow">SPEAK OUT LOUD</p><h2>말하기 타이머</h2></div><span class="two-minutes">1 MIN 30 SEC</span></div>
+          <div class="timer-row"><div><span class="tool-label">스피킹 타이머</span><div id="timer" class="timer">00:00 / 01:30</div></div><div class="timer-controls"><button class="button button-primary" id="timerStart" type="button">시작</button><button class="button button-small" id="timerPause" type="button" disabled>일시정지</button><button class="button button-small" id="timerReset" type="button">초기화</button></div></div>
+          <div class="record-row"><div class="record-info"><img src="deliverables/microphone_icon.png" alt="" aria-hidden="true"><div><span class="tool-label">내 답변 녹음</span><div class="record-status" role="status"><span class="dot" id="recordDot"></span><span id="recordLabel">준비됨</span></div></div></div><div class="record-controls"><button class="button button-record" id="recordStart" type="button"><img src="deliverables/microphone_icon.png" alt="" aria-hidden="true"><span>연습 시작</span></button><button class="button button-small" id="recordStop" type="button" disabled>종료</button></div></div>
+          <div class="receipt-actions" aria-label="추가 연습 도구">
+            <div class="receipt-tool-row">
+              <button class="receipt-tool-button" id="practiceReset" type="button"><span class="reset-icon" aria-hidden="true">↻</span>초기화</button>
+              <button class="receipt-tool-button" id="exampleListen" type="button"><span class="play-icon" aria-hidden="true">▶</span>예시 듣기</button>
+            </div>
+            <button class="next-question-button" id="nextQuestion" type="button"><img src="deliverables/next_question_arrow_icon.png" alt="" aria-hidden="true"><span>다음 질문</span></button>
+          </div>
+          <audio id="playback" controls hidden aria-label="녹음한 답변 다시 듣기"></audio><p id="recordError" class="error-message" role="alert" hidden></p>
+        </section>
+
+        <section class="hint-card" aria-label="스마트 힌트"><div class="hint-heading"><span class="hand-note">a little help ✎</span><h2>말문이 막힌다면</h2></div><details id="flowDetails"><summary>Story Flow <span>키워드 흐름</span></summary><div class="details-body"><p id="storyFlow" class="flow"></p><p>키워드를 문장으로 연결해 보세요.</p></div></details><details id="tipDetails"><summary>유형별 치트키 <span>답변 구조</span></summary><div class="details-body"><strong id="tipTitle"></strong><ul id="tipList"></ul></div></details></section>
+      </div>
+
+      <section id="favoritesView" class="favorites-view" aria-label="즐겨찾기 질문" hidden><div class="favorites-heading"><div><p class="eyebrow">SAVED QUESTIONS</p><h2>즐겨찾기</h2><p>다시 말해보고 싶은 질문을 모았어요.</p></div><img src="스티커/suitcase.png" alt="" aria-hidden="true"></div><ul id="questionList" class="favorites-list"></ul></section>
+    </main>
+
+    <div class="receipt-barcode" aria-label="영수증 바코드"></div>
+    <nav class="view-nav" aria-label="화면 선택"><button class="view-tab active" id="practiceNav" type="button" aria-current="page"><span class="nav-icon" aria-hidden="true">✎</span><span>연습</span></button><button class="view-tab" id="favoritesNav" type="button"><span class="nav-icon" aria-hidden="true">♡</span><span>즐겨찾기</span><span class="nav-count" id="favoriteCount">0</span></button></nav>
+  </div>
+</body>
+</html>
