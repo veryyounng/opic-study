@@ -42,8 +42,8 @@
         </section>
 
         <section class="practice-card" aria-label="실전 연습">
-          <div class="practice-heading"><div><p class="eyebrow">SPEAK OUT LOUD</p><h2>말하기 타이머</h2></div><span class="two-minutes">1 MIN 30 SEC</span></div>
-          <div class="timer-row"><div><span class="tool-label">스피킹 타이머</span><div id="timer" class="timer">00:00 / 01:30</div></div><div class="timer-controls"><button class="button button-primary" id="timerStart" type="button">시작</button><button class="button button-small" id="timerPause" type="button" disabled>일시정지</button><button class="button button-small" id="timerReset" type="button">초기화</button></div></div>
+          <div class="practice-heading"><div><p class="eyebrow">SPEAK OUT LOUD</p><h2>말하기 타이머</h2><button class="button button-small history-open" id="historyOpen" type="button">오늘 기록</button></div><span class="two-minutes">1 MIN 30 SEC</span></div>
+          <div class="timer-row"><div class="timer-display-row"><div><span class="tool-label">스피킹 타이머</span><div id="timer" class="timer">00:00 / 01:30</div></div></div><div class="timer-controls"><button class="button button-primary" id="timerStart" type="button">시작</button><button class="button button-small" id="timerPause" type="button" disabled>일시정지</button><button class="button button-small" id="timerReset" type="button">초기화</button></div></div>
           <div class="record-row"><div class="record-info"><img src="deliverables/microphone_icon.png" alt="" aria-hidden="true"><div><span class="tool-label">내 답변 녹음</span><div class="record-status" role="status"><span class="dot" id="recordDot"></span><span id="recordLabel">준비됨</span></div></div></div><div class="record-controls"><button class="button button-record" id="recordStart" type="button"><img src="deliverables/microphone_icon.png" alt="" aria-hidden="true"><span>연습 시작</span></button><button class="button button-small" id="recordStop" type="button" disabled>종료</button></div></div>
           <div class="receipt-actions" aria-label="추가 연습 도구">
             <div class="receipt-tool-row">
@@ -59,6 +59,27 @@
       </div>
 
       <section id="favoritesView" class="favorites-view" aria-label="즐겨찾기 질문" hidden><div class="favorites-heading"><div><p class="eyebrow">SAVED QUESTIONS</p><h2>즐겨찾기</h2><p>다시 말해보고 싶은 질문을 모았어요.</p></div><img src="스티커/suitcase.png" alt="" aria-hidden="true"></div><ul id="questionList" class="favorites-list"></ul></section>
+      <section id="historyView" class="history-view" aria-label="오늘의 연습 데이터" hidden>
+        <div class="history-heading"><div><p class="eyebrow">TODAY'S PRACTICE DATA</p><h2>오늘 연습 기록</h2></div><button class="button button-small" id="backToPractice" type="button">연습으로 돌아가기</button></div>
+        <p id="historyNotice" class="history-notice">기록은 이 브라우저에만 저장됩니다. 음성 파일과 답변 내용은 저장하지 않습니다. 아래에서 CSV로 내려받거나 기록을 지울 수 있어요.</p>
+        <form id="reflectionForm" class="reflection-form" hidden>
+          <h3>방금 연습을 돌아봐 주세요</h3><p id="reflectionQuestion"></p>
+          <input id="reflectionSessionId" type="hidden">
+          <label>답변을 끝까지 했나요?<select id="reflectionFinished"><option value="yes">네, 끝까지 했어요</option><option value="no">중간에 멈췄어요</option></select></label>
+          <label>얼마나 어려웠나요?<select id="reflectionDifficulty"><option value="1">1 · 매우 어려웠어요</option><option value="2">2 · 어려웠어요</option><option value="3" selected>3 · 보통이에요</option><option value="4">4 · 쉬웠어요</option><option value="5">5 · 매우 쉬웠어요</option></select></label>
+          <label>가장 막힌 부분은 무엇인가요?<select id="reflectionBlocker"><option value="none">특별히 막히지 않았어요</option><option value="ideas">아이디어·내용</option><option value="vocabulary">단어</option><option value="sentences">문장 만들기</option><option value="flow">말의 흐름</option><option value="time">시간 관리</option><option value="other">그 밖의 어려움</option></select></label>
+          <button class="button button-primary" type="submit">기록 저장</button>
+        </form>
+        <div class="history-summary" aria-live="polite">
+          <article><span>오늘 연습 시작</span><strong id="todayStarted">0</strong></article>
+          <article><span>오늘 완료</span><strong id="todayCompleted">0</strong></article>
+          <article><span>다시 연습</span><strong id="todayRetries">0</strong></article>
+          <article><span>힌트·예시 사용</span><strong id="todayHelpUses">0</strong></article>
+        </div>
+        <div class="history-actions"><button class="button button-primary" id="exportHistory" type="button">CSV 내려받기</button><button class="button button-small" id="clearHistory" type="button">기록 지우기</button></div>
+        <div class="history-table-wrap"><table class="history-table"><thead><tr><th>시간</th><th>기록</th><th>주제·유형</th><th>연습 시간</th></tr></thead><tbody id="historyRows"></tbody></table></div>
+        <p id="historyEmpty" class="empty-state">아직 기록이 없어요. 연습을 시작하면 여기에 쌓입니다.</p>
+      </section>
     </main>
 
     <div class="receipt-barcode" aria-label="영수증 바코드"></div>

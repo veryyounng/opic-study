@@ -99,8 +99,30 @@ window.addEventListener('resize',fitMobileReceipt);
     const $=id=>document.getElementById(id);
     const storage={
       read(key){try{const value=JSON.parse(localStorage.getItem(key));return Array.isArray(value)?value:[]}catch{return []}},
-      write(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
+      write(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch{return false}}
     };
+    const historyKey='opic-learning-log-v1';
+    let learningLog=storage.read(historyKey);
+    let activeSession=null;
+    const localDateKey=date=>`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    function logEvent(event,extra={}){
+      const now=new Date();
+      const entry={timestamp:now.toISOString(),localDate:localDateKey(now),event,sessionId:activeSession?.id||'',questionId:activeSession?.questionId||current?.id||'',topic:activeSession?.topic||current?.topic.name||'',type:activeSession?.type||current?.type||'',attempt:activeSession?.attempt||'',durationSeconds:activeSession?Math.max(0,Math.round((Date.now()-activeSession.startedAt)/1000)):'',...extra};
+      learningLog.push(entry);
+      if(!storage.write(historyKey,learningLog))$('historyNotice').textContent='브라우저 저장 공간을 사용할 수 없어 새로고침하면 기록이 사라질 수 있습니다.';
+      if(!$('historyView').hidden)renderHistory();
+    }
+    function startSession(source){
+      if(!current||activeSession)return;
+      const attempts=learningLog.filter(row=>row.event==='session_started'&&row.questionId===current.id).length;
+      activeSession={id:globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2,9)}`,startedAt:Date.now(),questionId:current.id,topic:current.topic.name,type:current.type,attempt:attempts+1};
+      logEvent('session_started',{source});
+    }
+    function endSession(completed,reason){
+      if(!activeSession)return;
+      logEvent(completed?'session_completed':'session_abandoned',{reason});
+      activeSession=null;
+    }
     let favorites=storage.read('opic-favorites-v1').filter(id=>pool.some(q=>q.id===id));
     let current=null,remaining=90,timerId=null,timerEnd=0;
     let recorder=null,stream=null,audioUrl=null,recording=false,requestingMic=false,recordingEpoch=0;
@@ -115,12 +137,43 @@ window.addEventListener('resize',fitMobileReceipt);
     function goToView(view){
       const practice=view==='practice';
       $('practiceView').hidden=!practice;
-      $('favoritesView').hidden=practice;
+      $('favoritesView').hidden=view!=='favorites';
+      $('historyView').hidden=view!=='history';
       $('practiceNav').classList.toggle('active',practice);
-      $('favoritesNav').classList.toggle('active',!practice);
-      if(practice){$('practiceNav').setAttribute('aria-current','page');$('favoritesNav').removeAttribute('aria-current')}
-      else{$('favoritesNav').setAttribute('aria-current','page');$('practiceNav').removeAttribute('aria-current');renderFavorites()}
+      $('favoritesNav').classList.toggle('active',view==='favorites');
+      $('practiceNav').toggleAttribute('aria-current',practice);
+      $('favoritesNav').toggleAttribute('aria-current',view==='favorites');
+      if(view==='favorites')renderFavorites();
+      if(view==='history')renderHistory();
       window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function renderHistory(){
+      const today=localDateKey(new Date());
+      const rows=learningLog.filter(row=>row.localDate===today);
+      const starts=rows.filter(row=>row.event==='session_started');
+      $('todayStarted').textContent=String(starts.length);
+      $('todayCompleted').textContent=String(rows.filter(row=>row.event==='session_completed').length);
+      $('todayRetries').textContent=String(starts.filter(row=>Number(row.attempt)>1).length);
+      $('todayHelpUses').textContent=String(rows.filter(row=>['hint_flow_open','hint_tip_open','example_play','translation_open','prompt_speech'].includes(row.event)).length);
+      const table=$('historyRows');table.replaceChildren();
+      const labels={question_shown:'질문 확인',session_started:'연습 시작',session_completed:'연습 완료',session_abandoned:'연습 중단',self_assessment:'연습 자기평가',recording_unavailable:'녹음 미지원',recording_permission_denied:'마이크 권한 거부',recording_error:'녹음 오류',hint_flow_open:'Story Flow',hint_tip_open:'유형 힌트',example_play:'예시 듣기',translation_open:'영어 문장 열기',prompt_speech:'질문 듣기',favorite_added:'즐겨찾기 저장',favorite_removed:'즐겨찾기 해제'};
+      rows.slice(-40).reverse().forEach(row=>{
+        const tr=document.createElement('tr');
+        const time=new Date(row.timestamp).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+        const values=[time,labels[row.event]||row.event,`${row.topic||'-'}${row.type?` · Type ${row.type}`:''}`,row.event==='session_completed'||row.event==='session_abandoned'?`${row.durationSeconds}초`:'-'];
+        values.forEach(value=>{const td=document.createElement('td');td.textContent=value;tr.append(td)});
+        table.append(tr);
+      });
+      $('historyEmpty').hidden=rows.length>0;
+      $('.history-table-wrap').hidden=rows.length===0;
+      const assessed=new Set(learningLog.filter(row=>row.event==='self_assessment').map(row=>row.sessionId));
+      const pending=[...learningLog].reverse().find(row=>row.event==='session_completed'&&!assessed.has(row.sessionId));
+      $('reflectionForm').hidden=!pending;
+      if(pending){
+        $('reflectionSessionId').value=pending.sessionId;
+        $('reflectionQuestion').textContent=`${pending.topic} · Type ${pending.type} 연습 (약 ${pending.durationSeconds}초)`;
+      }
     }
 
     function renderFavorites(){
@@ -168,10 +221,10 @@ window.addEventListener('resize',fitMobileReceipt);
       $('timerPause').disabled=!timerId;
       $('timerStart').textContent=seconds>0&&seconds<90?'계속':'시작';
     }
-    function tick(){remaining=Math.max(0,(timerEnd-Date.now())/1000);if(remaining<=0){clearInterval(timerId);timerId=null;remaining=0}renderTimer()}
+    function tick(){remaining=Math.max(0,(timerEnd-Date.now())/1000);if(remaining<=0){clearInterval(timerId);timerId=null;remaining=0;endSession(true,'timer_complete');if(recording)stopRecording()}renderTimer()}
     function pauseTimer(){if(!timerId)return;remaining=Math.max(0,(timerEnd-Date.now())/1000);clearInterval(timerId);timerId=null;renderTimer()}
     function resetTimer(){if(timerId)clearInterval(timerId);timerId=null;remaining=90;renderTimer()}
-    $('timerStart').addEventListener('click',()=>{if(remaining<=0)remaining=90;timerEnd=Date.now()+remaining*1000;timerId=setInterval(tick,200);renderTimer()});
+    $('timerStart').addEventListener('click',()=>{if(remaining<=0)remaining=90;startSession('timer');timerEnd=Date.now()+remaining*1000;timerId=setInterval(tick,200);renderTimer()});
     $('timerPause').addEventListener('click',pauseTimer);
     $('timerReset').addEventListener('click',resetPractice);
 
@@ -189,6 +242,7 @@ window.addEventListener('resize',fitMobileReceipt);
     }
     function stopRecording(){if(recorder&&recorder.state!=='inactive')recorder.stop()}
     function resetPractice(){
+      endSession(false,'reset');
       recordingEpoch++;
       resetTimer();
       if(recording)stopRecording();
@@ -199,6 +253,7 @@ window.addEventListener('resize',fitMobileReceipt);
 
     function showQuestion(question){
       if(window.speechSynthesis)window.speechSynthesis.cancel();
+      endSession(false,'question_changed');
       resetPractice();
       current=question;
       $('questionNumber').textContent=`${String(pool.indexOf(question)+1).padStart(2,'0')} / 64`;
@@ -216,6 +271,7 @@ window.addEventListener('resize',fitMobileReceipt);
       $('flowDetails').open=false;
       $('tipDetails').open=false;
       renderFavoriteButton();
+      logEvent('question_shown');
     }
     function randomQuestion(){
       const type=$('typeFilter').value,topic=$('topicFilter').value;
@@ -229,6 +285,7 @@ window.addEventListener('resize',fitMobileReceipt);
     $('practiceReset').addEventListener('click',resetPractice);
     $('exampleListen').addEventListener('click',()=>{
       if(!('speechSynthesis'in window))return;
+      logEvent('example_play');
       window.speechSynthesis.cancel();
       const examples={
         1:'I really enjoy this in my free time. It helps me relax, and I especially like the atmosphere. I always feel refreshed afterward.',
@@ -242,13 +299,16 @@ window.addEventListener('resize',fitMobileReceipt);
     });
     $('favoriteBtn').addEventListener('click',()=>{
       if(!current)return;
-      favorites=favorites.includes(current.id)?favorites.filter(id=>id!==current.id):[current.id,...favorites];
+      const removing=favorites.includes(current.id);
+      favorites=removing?favorites.filter(id=>id!==current.id):[current.id,...favorites];
+      logEvent(removing?'favorite_removed':'favorite_added');
       storage.write('opic-favorites-v1',favorites);
       renderFavoriteButton();
       renderFavorites();
     });
     $('translationBtn').addEventListener('click',()=>{
       const open=$('prompt').hidden;
+      if(open)logEvent('translation_open');
       $('prompt').hidden=!open;
       $('questionGuide').hidden=open;
       $('questionInstruction').hidden=open;
@@ -257,6 +317,7 @@ window.addEventListener('resize',fitMobileReceipt);
     });
     $('speakBtn').addEventListener('click',()=>{
       if(!('speechSynthesis'in window))return;
+      logEvent('prompt_speech');
       window.speechSynthesis.cancel();
       const speech=new SpeechSynthesisUtterance(current.prompt);
       speech.lang='en-US';speech.rate=.92;
@@ -265,6 +326,29 @@ window.addEventListener('resize',fitMobileReceipt);
     if(!('speechSynthesis'in window)){$('speakBtn').disabled=true;$('speakBtn').title='이 브라우저에서는 질문 읽기를 지원하지 않습니다.'}
     $('practiceNav').addEventListener('click',()=>goToView('practice'));
     $('favoritesNav').addEventListener('click',()=>goToView('favorites'));
+    $('historyOpen').addEventListener('click',()=>goToView('history'));
+    $('backToPractice').addEventListener('click',()=>goToView('practice'));
+    $('flowDetails').addEventListener('toggle',()=>{if($('flowDetails').open)logEvent('hint_flow_open')});
+    $('tipDetails').addEventListener('toggle',()=>{if($('tipDetails').open)logEvent('hint_tip_open')});
+
+    function csvCell(value){return `"${String(value??'').replaceAll('"','""')}"`}
+    $('exportHistory').addEventListener('click',()=>{
+      const columns=['timestamp','localDate','event','sessionId','questionId','topic','type','attempt','durationSeconds','source','reason','answeredToEnd','difficulty','blocker'];
+      const csv=[columns.map(csvCell).join(','),...learningLog.map(row=>columns.map(column=>csvCell(row[column])).join(','))].join('\r\n');
+      const blob=new Blob(['\uFEFF',csv],{type:'text/csv;charset=utf-8'});
+      const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`opic-practice-${localDateKey(new Date())}.csv`;link.click();URL.revokeObjectURL(url);
+    });
+    $('clearHistory').addEventListener('click',()=>{
+      learningLog=[];activeSession=null;storage.write(historyKey,learningLog);renderHistory();
+    });
+    $('reflectionForm').addEventListener('submit',event=>{
+      event.preventDefault();
+      const sessionId=$('reflectionSessionId').value;
+      const session=learningLog.find(row=>row.event==='session_completed'&&row.sessionId===sessionId);
+      if(!session)return;
+      logEvent('self_assessment',{sessionId,questionId:session.questionId,topic:session.topic,type:session.type,attempt:session.attempt,answeredToEnd:$('reflectionFinished').value,difficulty:Number($('reflectionDifficulty').value),blocker:$('reflectionBlocker').value});
+      renderHistory();
+    });
 
     $('recordStart').addEventListener('click',async()=>{
       if(requestingMic||recording)return;
@@ -274,6 +358,7 @@ window.addEventListener('resize',fitMobileReceipt);
       clearAudio();$('recordError').hidden=true;
       if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){
         requestingMic=false;setRecordStatus('녹음 지원 안 됨');
+        logEvent('recording_unavailable',{reason:'unsupported'});
         $('recordError').textContent='이 브라우저에서는 녹음을 지원하지 않습니다. HTTPS 또는 localhost에서 열어보세요.';
         $('recordError').hidden=false;return;
       }
@@ -306,17 +391,19 @@ window.addEventListener('resize',fitMobileReceipt);
           obtained.getTracks().forEach(track=>track.stop());
           recording=false;setRecordStatus('녹음 오류');
         };
-        mediaRecorder.start();recording=true;setRecordStatus('녹음 중…',true);
+        mediaRecorder.start();recording=true;startSession('recording');setRecordStatus('녹음 중…',true);
         if(!timerId)$('timerStart').click();
       }catch(error){
         if(epoch===recordingEpoch){
+          logEvent(error.name==='NotAllowedError'?'recording_permission_denied':'recording_error',{reason:error.name});
           $('recordError').textContent=error.name==='NotAllowedError'?'마이크 사용 권한을 허용해 주세요.':'마이크를 사용할 수 없습니다. 연결 상태와 브라우저 설정을 확인해 주세요.';
           $('recordError').hidden=false;setRecordStatus('녹음할 수 없음');
         }
       }finally{requestingMic=false;if(!recording)$('recordStart').disabled=false}
     });
-    $('recordStop').addEventListener('click',()=>{pauseTimer();stopRecording()});
+    $('recordStop').addEventListener('click',()=>{pauseTimer();endSession(true,'recording_stopped');stopRecording()});
     window.addEventListener('beforeunload',()=>{
+      endSession(false,'page_closed');
       if(timerId)clearInterval(timerId);
       if(window.speechSynthesis)window.speechSynthesis.cancel();
       if(stream)stream.getTracks().forEach(track=>track.stop());
