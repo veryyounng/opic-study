@@ -1,6 +1,6 @@
 'use strict';
 function fitMobileReceipt(){
-  const scale=Math.min(1,window.innerWidth/390,window.innerHeight/844);
+  const scale=Math.min(1,window.innerWidth/390,Math.max(.1,(window.innerHeight-16)/844));
   document.documentElement.style.setProperty('--frame-scale',String(scale));
 }
 fitMobileReceipt();
